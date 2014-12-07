@@ -9,7 +9,7 @@
 #include "TM4C123.h"
 #include "boardUtil.h"
 #include "interrupts.h"
-#include "Indicator.h"
+#include "drv8833.h"
 
 #define FW_VERSION  "0.0.1"
 
@@ -22,18 +22,13 @@
 //*****************************************************************************
 void initializeBoard(void)
 {
-  
   DisableInterrupts();
-  
+
   serialDebugInit();
-	initializeSysTick(TIME_QUANTUM_MICROS);
-	initializeRightSonar();
-	initializeCenterSonar();
-	//initializeIndicator(MAIN_INDICATOR);
-	
+	initializeSysTick(MICROS_PER_TICK);
+	drv8833_gpioInit();
 
   EnableInterrupts();
-  
 }
 
 
@@ -42,33 +37,22 @@ void initializeBoard(void)
 int 
 main(void)
 {
-	//static bool clk_val = true;
-	Indicator indicator;
-	uint32_t centerVal;
-  initializeBoard();
-	createIndicator(&indicator, MAIN_INDICATOR);
+	initializeBoard();
 
   printf("\n\r");
   printf("**************************************\n\r");
   printf("* ECE315 Base Project                 \n\r");
   printf("* FW Version:%s\n\r",FW_VERSION);
   printf("**************************************\n\r");
-  
-  // Infinite Loop
-  while(1)
-  {
-		if (CheckADC) {
-			CheckADC = false;
-			//clk_val = !clk_val;
-			triggerIndicator(&indicator);
-			//setMainIndicator(clk_val);
-			
-			centerVal = readCenterSonar();
-			//printf("%d\n", readCenterSonar());
-		}
-		if (PrintVals) {
-			PrintVals = false;
-			printf("Center: %3d Right: %3d\n", centerVal, SonarRightDistance);
-		}
-  }
+	
+	drv8833_forward(100);
+	wait(2000);
+	drv8833_reverse(100);
+	wait(2000);
+	drv8833_turnLeft(100);
+	wait(5000);
+	drv8833_turnRight(100);
+	wait(5000);
+	drv8833_stop();
+	while(1);
 }

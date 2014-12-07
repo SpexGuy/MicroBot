@@ -100,23 +100,37 @@
 #define		SYSTICK_INDICATOR_BASE		GPIOB_BASE
 #define		SYSTICK_INDICATOR_PORT		PB0
 #define		SYSTICK_INDICATOR					SYSTICK_INDICATOR_BASE, SYSTICK_INDICATOR_PORT // ALWAYS PUT INDICATOR PARAMS IN THIS ORDER
-#define		MAIN_INDICATOR_BASE		GPIOB_BASE
-#define		MAIN_INDICATOR_PORT		PB1
-#define		MAIN_INDICATOR				MAIN_INDICATOR_BASE, MAIN_INDICATOR_PORT
-//#define		setSystickIndicator(value)		GPIOB->DATA = (value) ? (GPIOB->DATA | SYSTICK_INDICATOR_PORT) : (GPIOB->DATA & ~SYSTICK_INDICATOR_PORT)
-//#define		setMainIndicator(value)				GPIOB->DATA = (value) ? (GPIOB->DATA | MAIN_INDICATOR_PORT) : (GPIOB->DATA & ~MAIN_INDICATOR_PORT)
+#define		MAIN_INDICATOR_BASE				GPIOB_BASE
+#define		MAIN_INDICATOR_PORT				PB1
+#define		MAIN_INDICATOR						MAIN_INDICATOR_BASE, MAIN_INDICATOR_PORT
 
-extern volatile int SonarRightDistance;
+#define		LEFT_MOTOR_BASE						GPIOB_BASE
+#define		LEFT_MOTOR_FORWARD_PORT		PB4
+#define		LEFT_MOTOR_FORWARD				LEFT_MOTOR_BASE, LEFT_MOTOR_FORWARD_PORT
+#define		LEFT_MOTOR_BACKWARD_PORT	PB5
+#define		LEFT_MOTOR_BACKWARD				LEFT_MOTOR_BASE, LEFT_MOTOR_BACKWARD_PORT
+#define		LEFT_MOTOR_PCNTL					(GPIO_PCTL_PB4_M0PWM2 | GPIO_PCTL_PB5_M0PWM3)
+
+#define		RIGHT_MOTOR_BASE					GPIOE_BASE
+#define		RIGHT_MOTOR_FORWARD_PORT	PE4
+#define		RIGHT_MOTOR_FORWARD				RIGHT_MOTOR_BASE, RIGHT_MOTOR_FORWARD_PORT
+#define		RIGHT_MOTOR_BACKWARD_PORT	PE5
+#define		RIGHT_MOTOR_BACKWARD			RIGHT_MOTOR_BASE, RIGHT_MOTOR_BACKWARD_PORT
+#define		RIGHT_MOTOR_PCNTL					(GPIO_PCTL_PE4_M1PWM2 | GPIO_PCTL_PE5_M1PWM3)
+
+#define		MOTOR_SLEEP_BASE					GPIOF_BASE
+#define		MOTOR_SLEEP_PORT					PF3
+#define		MOTOR_SLEEP								MOTOR_SLEEP_BASE, MOTOR_SLEEP_PORT
+
+#define		MOTOR_FAULT_BASE					GPIOF_BASE
+#define		MOTOR_FAULT_PORT					PF2
+#define		MOTOR_FAULT								MOTOR_FAULT_BASE, MOTOR_FAULT_PORT
+
+#define		COUNT(arr)								(sizeof(arr)/sizeof(arr[0]))
 
 void serialDebugInit(void);
 void DisableInterrupts(void);
 void EnableInterrupts(void);
-void initializeRightSonar(void);
-void initializeCenterSonar(void);
-void initializeSysTick(int micros);
-//void initializeIndicator(uint32_t base, uint32_t port);
-
-void updateRightSonar(void);
-uint32_t readCenterSonar(void);
+void wait(int millis);
 
 #endif

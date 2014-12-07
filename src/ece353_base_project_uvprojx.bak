@@ -419,6 +419,21 @@
               <FileType>1</FileType>
               <FilePath>.\interrupts.c</FilePath>
             </File>
+            <File>
+              <FileName>drv8833.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\drv8833.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>Indicator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Indicator.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

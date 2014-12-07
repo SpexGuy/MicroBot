@@ -56,48 +56,12 @@ void serialDebugInit(void)
   InitializeUART(&serialDebugConfig);
 }
 
-void initializeRightSonar(void) {
-	validatePortIsOn(SONAR_RIGHT_BASE);
-	gpioConfigDigitalEnable(SONAR_RIGHT_BASE, SONAR_RIGHT_PIN);
-	gpioConfigPinAsInput(SONAR_RIGHT_BASE, SONAR_RIGHT_PIN);
+/**
+ * Waits for the given number of milliseconds
+ * DO NOT CALL THIS FROM SYSTICK
+ * You probably shouldn't call this from any other interrupts either since it's a wait.
+ */
+void wait(int millis) {
+	int stopTime = Time + (millis * TICKS_PER_SECOND)/1000;
+	while(Time - stopTime < 0);
 }
-
-volatile int SonarRightDistance = 0;
-void updateRightSonar(void) {
-	static bool lastSonarVal = false;
-	static int sonarCount = 0;
-	bool sonarVal = SONAR_RIGHT_VALUE;
-	if (sonarVal != lastSonarVal) {
-		if (sonarVal) {
-			sonarCount = 0;
-		} else {
-			SonarRightDistance = (sonarCount * TIME_QUANTUM_MICROS) / SONAR_RIGHT_MICROS_PER_INCH;
-		}
-	} else {
-		sonarCount++;
-	}
-	lastSonarVal = sonarVal;
-}
-
-void initializeCenterSonar(void) {
-	validatePortIsOn(SONAR_CENTER_BASE);
-	gpioConfigAnalogEnable(SONAR_CENTER_BASE, SONAR_CENTER_PIN);
-	gpioConfigPinAsInput(SONAR_CENTER_BASE, SONAR_CENTER_PIN);
-	gpioConfigAltFunction(SONAR_CENTER_BASE, SONAR_CENTER_PIN);
-	initializeADC(SONAR_CENTER_ADC_BASE);
-}
-
-uint32_t readCenterSonar(void) {
-	return (getADCValue(SONAR_CENTER_ADC_BASE, SONAR_CENTER_ADC_CHANNEL) * SONAR_MICROV_PER_UNIT) / SONAR_CENTER_MICROV_PER_INCH;
-}
-
-void initializeSysTick(int micros) {
-	SysTick_Config(SystemCoreClock * micros / 1000000);
-	createIndicator(&systickIndicator, SYSTICK_INDICATOR);
-}
-
-//void initializeIndicator(uint32_t base, uint32_t port) {
-//	validatePortIsOn(base);
-//	gpioConfigDigitalEnable(base, port);
-//	gpioConfigPinAsOutput(base, port);
-//}

@@ -1,6 +1,5 @@
-
 #include "interrupts.h"
-
+#include "Indicator.h"
 
  /****************************************************************************
  * The SysTick Handler 
@@ -13,23 +12,54 @@
  ****************************************************************************/
 
 #define ADC_RATE 200
-#define PRINT_RATE (1000000/TIME_QUANTUM_MICROS)
+#define PRINT_RATE TICKS_PER_SECOND
+
+#define MAX_NUM_TASKS 64
+
+int numTasks = 0;
+struct {
+	void (*run)(void *);
+	void *param;
+} systickTasks[MAX_NUM_TASKS];
+
+static void runVoidFunctor(void *param) {
+	((void (*)(void))param)();
+}
+
+int addSystickTask(void (*run)(void *), void *param) {
+	if (numTasks < MAX_NUM_TASKS) {
+		systickTasks[numTasks].run = run;
+		systickTasks[numTasks].param = param;
+		numTasks++;
+		return 0;
+	} else {
+		printf("ERROR! too many systick tasks!\r\n");
+		return -1;
+	}
+}
+
+int addVoidSystickTask(void (*run)(void)) {
+	return addSystickTask(runVoidFunctor, run);
+}
+
 
 volatile bool CheckADC = false;
 volatile bool PrintVals = false;
 volatile int Time = 0;
 
-Indicator systickIndicator;
+static Indicator systickIndicator;
+
+void initializeSysTick(int micros) {
+	SysTick_Config(SystemCoreClock * micros / 1000000);
+	createIndicator(&systickIndicator, SYSTICK_INDICATOR);
+	addSystickTask((void (*)(void *))&triggerIndicator, &systickIndicator);
+}
 
 void SysTick_Handler(void)
 {
-	//static bool indicatorValue = false;
-	//indicatorValue = !indicatorValue;
-	//setSystickIndicator(indicatorValue);
-	triggerIndicator(&systickIndicator);
+	int c;
 	Time++;
-	CheckADC |= (Time % ADC_RATE == 0);
-	PrintVals |= (Time % PRINT_RATE == 0);
-	updateRightSonar();
-	
+	for (c = 0; c < numTasks; c++) {
+		systickTasks[c].run(systickTasks[c].param);
+	}
 }
